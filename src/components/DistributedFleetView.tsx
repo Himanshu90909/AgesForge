@@ -14,15 +14,15 @@ import {
 } from 'lucide-react';
 
 export const DistributedFleetView: React.FC = () => {
-  const { workers, queueStats } = useAegis();
-  const [liveWorkers, setLiveWorkers] = useState(workers);
+  const { workerNodes, fleetQueue } = useAegis();
+  const [liveWorkers, setLiveWorkers] = useState(workerNodes);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setLiveWorkers(prev => prev.map(w => ({
         ...w,
-        cpuUsagePercent: Math.min(95, Math.max(5, Math.floor(w.cpuUsagePercent + (Math.random() * 10 - 5)))),
-        tasksProcessed: w.status === 'BUSY' ? w.tasksProcessed + 1 : w.tasksProcessed
+        cpuUsage: Math.min(95, Math.max(5, Math.floor(w.cpuUsage + (Math.random() * 10 - 5)))),
+        tasksProcessed: w.status !== 'IDLE' ? w.tasksProcessed + 1 : w.tasksProcessed
       })));
     }, 2000);
     return () => clearInterval(interval);
@@ -61,23 +61,23 @@ export const DistributedFleetView: React.FC = () => {
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 font-mono text-center">
         <div className="p-3 bg-slate-900/80 border border-slate-800 rounded-xl">
           <span className="text-[10px] text-slate-400 uppercase block">Pending Jobs</span>
-          <span className="text-lg font-bold text-amber-400">{queueStats.pendingJobs}</span>
+          <span className="text-lg font-bold text-amber-400">{fleetQueue.pendingJobs}</span>
         </div>
         <div className="p-3 bg-slate-900/80 border border-slate-800 rounded-xl">
           <span className="text-[10px] text-slate-400 uppercase block">Active Processing</span>
-          <span className="text-lg font-bold text-cyan-400">{queueStats.activeJobs}</span>
+          <span className="text-lg font-bold text-cyan-400">{fleetQueue.activeJobs}</span>
         </div>
         <div className="p-3 bg-slate-900/80 border border-slate-800 rounded-xl">
           <span className="text-[10px] text-slate-400 uppercase block">Completed Tasks</span>
-          <span className="text-lg font-bold text-emerald-400">{queueStats.completedJobs.toLocaleString()}</span>
+          <span className="text-lg font-bold text-emerald-400">{fleetQueue.completedJobs.toLocaleString()}</span>
         </div>
         <div className="p-3 bg-slate-900/80 border border-slate-800 rounded-xl">
           <span className="text-[10px] text-slate-400 uppercase block">Failed Retries</span>
-          <span className="text-lg font-bold text-rose-400">{queueStats.failedJobs}</span>
+          <span className="text-lg font-bold text-rose-400">{fleetQueue.failedJobs}</span>
         </div>
         <div className="p-3 bg-slate-900/80 border border-slate-800 rounded-xl">
           <span className="text-[10px] text-slate-400 uppercase block">Cluster Throughput</span>
-          <span className="text-lg font-bold text-purple-400">{queueStats.throughputRps} rps</span>
+          <span className="text-lg font-bold text-purple-400">{fleetQueue.throughputPerMin} /min</span>
         </div>
       </div>
 
@@ -116,33 +116,33 @@ export const DistributedFleetView: React.FC = () => {
                   </td>
                   <td className="py-3 px-3 text-slate-300">
                     <span className="px-1.5 py-0.2 rounded bg-slate-950 border border-slate-800 text-[10px]">
-                      {w.type}
+                      {w.engine}
                     </span>
                   </td>
                   <td className="py-3 px-3">
                     <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                      w.status === 'BUSY'
+                      w.status !== 'IDLE'
                         ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
                         : 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'
                     }`}>
-                      {w.status}
+                    {w.status}
                     </span>
                   </td>
-                  <td className="py-3 px-3 text-slate-200 truncate max-w-[200px]" title={w.currentTask || 'Idle'}>
-                    {w.currentTask || '—'}
+                  <td className="py-3 px-3 text-slate-200 truncate max-w-[200px]" title={w.currentTaskTitle || 'Idle'}>
+                    {w.currentTaskTitle || '—'}
                   </td>
                   <td className="py-3 px-3 text-slate-300">
                     <div className="flex items-center gap-2">
                       <div className="w-12 bg-slate-950 rounded-full h-1.5 overflow-hidden">
                         <div
-                          className={`h-full ${w.cpuUsagePercent > 80 ? 'bg-rose-500' : 'bg-cyan-400'}`}
-                          style={{ width: `${w.cpuUsagePercent}%` }}
+                          className={`h-full ${w.cpuUsage > 80 ? 'bg-rose-500' : 'bg-cyan-400'}`}
+                          style={{ width: `${w.cpuUsage}%` }}
                         />
                       </div>
-                      <span>{w.cpuUsagePercent}%</span>
+                      <span>{w.cpuUsage}%</span>
                     </div>
                   </td>
-                  <td className="py-3 px-3 text-slate-300">{w.memoryUsageMb} MB</td>
+                  <td className="py-3 px-3 text-slate-300">{w.ramUsageMb} MB</td>
                   <td className="py-3 px-3 font-bold text-slate-100">{w.tasksProcessed.toLocaleString()}</td>
                   <td className="py-3 px-3 text-slate-400">{w.uptime}</td>
                 </tr>
