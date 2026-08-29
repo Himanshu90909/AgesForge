@@ -26,9 +26,10 @@ async function handleTool(name: string, args: Record<string, any>) {
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Mcp-Session-Id, Mcp-Protocol-Version");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   if (req.method === "OPTIONS") return res.status(204).end();
-  if (req.method !== "POST") return res.status(405).json({ error: "MCP endpoint accepts POST requests only" });
+  if (req.method === "GET") return res.status(200).json({ service: "AegisForge MCP Server", status: "online", endpoint: "/mcp", transport: "JSON-RPC 2.0 over POST", tools: tools.map((tool) => tool.name), usage: "Send an MCP initialize request, then tools/list or tools/call." });
+  if (req.method !== "POST") return res.status(405).json({ error: "Use POST with a JSON-RPC MCP request, or GET for server status." });
 
   const request = req.body || {};
   const id = request.id ?? null;
