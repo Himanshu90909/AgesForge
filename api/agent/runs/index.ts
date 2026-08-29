@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { createRun, listRuns } from "../../lib/core";
+import { createRun, listRuns } from "../../_lib/core";
 
 export default function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === "GET") return res.status(200).json({ runs: listRuns(), source: "ephemeral-deployment-memory" });
