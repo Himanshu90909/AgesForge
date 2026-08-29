@@ -1,0 +1,6 @@
+{
+  "name": "AegisForge — Self-Evolving Coding Agent OS",
+  "description": "Autonomous coding-agent operating system, execution harness, failure intelligence engine, adaptive sandboxing, regression lab, and distributed fleet benchmark platform.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
